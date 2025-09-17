@@ -136,20 +136,20 @@ export function CameraSettings() {
 
           {BACKGROUND_IMAGES.map((image) => (
             <button
-              key={image.path.src}
-              onClick={() => selectBackground('image', image.path.src)}
+              key={image.path}
+              onClick={() => selectBackground('image', image.path)}
               className="lk-button"
               aria-pressed={
-                backgroundType === 'image' && virtualBackgroundImagePath === image.path.src
+                backgroundType === 'image' && virtualBackgroundImagePath === image.path
               }
               style={{
-                backgroundImage: `url(${image.path.src})`,
+                backgroundImage: `url(${image.path})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 width: '80px',
                 height: '60px',
                 border:
-                  backgroundType === 'image' && virtualBackgroundImagePath === image.path.src
+                  backgroundType === 'image' && virtualBackgroundImagePath === image.path
                     ? '2px solid #0090ff'
                     : '1px solid #d1d1d1',
               }}
