@@ -103,7 +103,8 @@
   background: linear-gradient(135deg, #f96418 0%, #f96418 100%);
   border: none;
   border-radius: 50px;
-  padding: 1rem 3rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
   font-size: 1.2rem !important;
   font-weight: 600;
   color: #e3e3ed;
@@ -111,6 +112,7 @@
   transition: all 0.3s ease;
   letter-spacing: 1px;
   vertical-align: middle;
+  height: 41px;
 }
 
 .hpStartButtonIcon {
@@ -118,6 +120,101 @@
   width: 18px;
   height: 18px;
   vertical-align: middle;
+}
+
+/* Or Separator */
+.hpOrSeparator {
+  display: flex;
+  align-items: center;
+  margin: 2rem 0;
+  gap: 1rem;
+  color: #9b9b9b !important;
+}
+
+.hpOrLine {
+  flex: 1;
+  height: 1px;
+  background: #9b9b9b;
+  color: #9b9b9b !important;
+}
+
+.hpOrText {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.9rem;
+  color: #9b9b9b;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+/* Join Section */
+.hpJoinSection {
+  margin-top: 1rem;
+}
+
+.hpJoinInputContainer {
+  display: flex;
+  align-items: center;
+  background: #0d0d0d;
+  border: 1px solid #121212;
+  border-radius: 0;
+  padding-left: 0.75rem;
+  gap: 0.75rem;
+  transition: border-color 0.3s ease;
+}
+
+.hpJoinInputContainer:focus-within {
+  border-color: #f96418;
+}
+
+.hpJoinInputIcon {
+  width: 16px;
+  height: 16px;
+  opacity: 0.6;
+}
+
+.hpJoinInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #e3e3ed;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.hpJoinInput::placeholder {
+  color: #9b9b9b;
+}
+
+.hpJoinButton {
+  font-family: 'Space Grotesk', sans-serif;
+  background: #f96418;
+  border: none;
+  border-radius: 0;
+  padding: 0.5rem 1.5rem;
+  font-size: 1.2rem !important;
+  font-weight: 600;
+  color: #e3e3ed;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.hpJoinButton:hover {
+  background: #e55a2b;
+  transform: translateY(-1px);
+}
+
+.hpJoinButton:active {
+  transform: translateY(0);
+}
+
+.hpJoinError {
+  margin-top: 0.5rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.8rem;
+  color: #ff6b6b;
+  text-align: left;
 }
 
 /* Footer */
@@ -154,6 +251,17 @@
 
 .hpSocialIcon:hover {
   color: #f96418;
+}
+
+.hpSocialIconIcon {
+  width: 20px;
+  height: 20px;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.hpSocialIcon:hover .hpSocialIconIcon {
+  opacity: 1;
 }
 
 /* Responsive Design */
@@ -198,6 +306,25 @@
   
   .hpFooterRight {
     gap: 1.5rem;
+  }
+
+  .hpJoinInputContainer {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .hpJoinInput {
+    width: 100%;
+    text-align: center;
+  }
+
+  .hpJoinButton {
+    width: 100%;
+  }
+
+  .hpOrSeparator {
+    margin: 1.5rem 0;
   }
 }
 

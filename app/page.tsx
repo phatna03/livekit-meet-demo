@@ -163,9 +163,40 @@ function CustomConnectionTab(props: { label: string }) {
 
 export default function Page() {
   const router = useRouter();
+  const [joinLink, setJoinLink] = useState('');
+  const [joinError, setJoinError] = useState('');
   
   const startMeeting = () => {
     router.push(`/rooms/${generateRoomId()}`);
+  };
+
+  const handleJoinMeeting = () => {
+    setJoinError('');
+    
+    if (!joinLink.trim()) {
+      setJoinError('Please enter a meeting link');
+      return;
+    }
+
+    // Validate link format: [domain]/rooms/[room_name]
+    const urlPattern = /^(https?:\/\/[^\/]+)?\/rooms\/([a-zA-Z0-9\-]+)$/;
+    const match = joinLink.match(urlPattern);
+    
+    if (!match) {
+      setJoinError('Invalid meeting link format. Please use: /rooms/room-name');
+      return;
+    }
+
+    // Extract room name and navigate
+    const roomName = match[2];
+    router.push(`/rooms/${roomName}`);
+  };
+
+  const handleJoinLinkChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setJoinLink(e.target.value);
+    if (joinError) {
+      setJoinError('');
+    }
   };
 
   return (
@@ -194,6 +225,35 @@ export default function Page() {
               <img src="/icons/start_meeting.png" alt="Start Meeting" className={styles.hpStartButtonIcon} />
               Start Meeting
             </button>
+
+            {/* Or separator */}
+            <div className={styles.hpOrSeparator}>
+              <div className={styles.hpOrLine}></div>
+              <span className={styles.hpOrText}>Or</span>
+              <div className={styles.hpOrLine}></div>
+            </div>
+
+            {/* Join section */}
+            <div className={styles.hpJoinSection}>
+              <div className={styles.hpJoinInputContainer}>
+                <img src="/icons/input_link.png" alt="Link" className={styles.hpJoinInputIcon} />
+                <input
+                  type="text"
+                  value={joinLink}
+                  onChange={handleJoinLinkChange}
+                  placeholder="Join using the meeting link or code"
+                  className={styles.hpJoinInput}
+                />
+                <button className={styles.hpJoinButton} onClick={handleJoinMeeting}>
+                  Join
+                </button>
+              </div>
+              {joinError && (
+                <div className={styles.hpJoinError}>
+                  {joinError}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
