@@ -104,24 +104,20 @@
   border: none;
   border-radius: 50px;
   padding: 1rem 3rem;
-  font-size: 1.2rem;
+  font-size: 1.2rem !important;
   font-weight: 600;
   color: #e3e3ed;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
   letter-spacing: 1px;
+  vertical-align: middle;
 }
 
-.hpStartButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(102, 126, 234, 0.6);
-  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
-}
-
-.hpStartButton:active {
-  transform: translateY(0);
-  box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
+.hpStartButtonIcon {
+  margin-right: 8px;
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
 }
 
 /* Footer */
