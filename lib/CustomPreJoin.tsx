@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
-import { LocalUserChoices } from '@livekit/components-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { LocalUserChoices, TrackToggle } from '@livekit/components-react';
+import { Track } from 'livekit-client';
 import { useRouter } from 'next/navigation';
 import styles from '../styles/CustomPreJoin.module.css';
 
@@ -17,35 +18,35 @@ export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProp
   const [videoEnabled, setVideoEnabled] = useState(defaults.videoEnabled ?? true);
   const [audioEnabled, setAudioEnabled] = useState(defaults.audioEnabled ?? true);
   const [isJoining, setIsJoining] = useState(false);
-  const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
-  const [videoDeviceId, setVideoDeviceId] = useState<string>('');
-  const [audioDeviceId, setAudioDeviceId] = useState<string>('');
   const [serverType, setServerType] = useState<'livekit' | 'custom'>('custom');
+  const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
+  const [selectedAudioDevice, setSelectedAudioDevice] = useState<string>('');
+  const [selectedVideoDevice, setSelectedVideoDevice] = useState<string>('');
   const [showAudioDropdown, setShowAudioDropdown] = useState(false);
   const [showVideoDropdown, setShowVideoDropdown] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Load available devices
-  React.useEffect(() => {
+  useEffect(() => {
     navigator.mediaDevices.enumerateDevices().then((devices) => {
       setDevices(devices);
-      const videoDevices = devices.filter((device) => device.kind === 'videoinput');
       const audioDevices = devices.filter((device) => device.kind === 'audioinput');
+      const videoDevices = devices.filter((device) => device.kind === 'videoinput');
 
-      if (videoDevices.length > 0) {
-        setVideoDeviceId(videoDevices[0].deviceId);
-      }
       if (audioDevices.length > 0) {
-        setAudioDeviceId(audioDevices[0].deviceId);
+        setSelectedAudioDevice(audioDevices[0].deviceId);
+      }
+      if (videoDevices.length > 0) {
+        setSelectedVideoDevice(videoDevices[0].deviceId);
       }
     });
   }, []);
 
   // Close dropdowns when clicking outside
-  React.useEffect(() => {
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      if (!target.closest('.cpDeviceControl')) {
+      if (!target.closest(`.${styles.cpDeviceControl}`)) {
         setShowAudioDropdown(false);
         setShowVideoDropdown(false);
       }
@@ -59,10 +60,10 @@ export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProp
 
   // Start camera preview
   React.useEffect(() => {
-    if (videoEnabled && videoDeviceId) {
+    if (videoEnabled && videoRef.current) {
       navigator.mediaDevices
         .getUserMedia({
-          video: { deviceId: videoDeviceId },
+          video: true,
           audio: false,
         })
         .then((stream) => {
@@ -74,8 +75,10 @@ export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProp
           console.error('Error accessing camera:', error);
           onError(error);
         });
+    } else if (videoRef.current) {
+      videoRef.current.srcObject = null;
     }
-  }, [videoEnabled, videoDeviceId, onError]);
+  }, [videoEnabled, onError]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,8 +95,8 @@ export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProp
         username: username.trim(),
         videoEnabled,
         audioEnabled,
-        videoDeviceId: videoDeviceId ? videoDeviceId : undefined,
-        audioDeviceId: audioDeviceId ? audioDeviceId : undefined,
+        videoDeviceId: selectedVideoDevice || undefined,
+        audioDeviceId: selectedAudioDevice || undefined,
       };
 
       onSubmit(values, serverType);
@@ -107,8 +110,6 @@ export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProp
     router.push('/');
   };
 
-  const videoDevices = devices.filter((device) => device.kind === 'videoinput');
-  const audioDevices = devices.filter((device) => device.kind === 'audioinput');
 
   return (
     <div className={styles.cpContainer}>
@@ -137,9 +138,9 @@ export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProp
                   onClick={() => setAudioEnabled(!audioEnabled)}
                   className={styles.cpIconButton}
                 >
-                  <img 
-                    src={audioEnabled ? "/icons/mic_on.png" : "/icons/mic_off.png"} 
-                    alt="Microphone" 
+                  <img
+                    src={audioEnabled ? '/icons/mic_on.png' : '/icons/mic_off.png'}
+                    alt="Microphone"
                     className={styles.cpDeviceIcon}
                   />
                 </button>
@@ -149,26 +150,30 @@ export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProp
                   className={styles.cpDropdownButton}
                 >
                   <span className={styles.cpDeviceText}>
-                    {audioDevices.find((d) => d.deviceId === audioDeviceId)?.label || 'Microphone'}
+                    {devices.find((d) => d.deviceId === selectedAudioDevice)?.label || 'Microphone'}
                   </span>
                   <span className={styles.cpDropdownArrow}>▼</span>
                 </button>
               </div>
               {showAudioDropdown && (
                 <div className={styles.cpDropdown}>
-                  {audioDevices.map((device) => (
-                    <button
-                      key={device.deviceId}
-                      type="button"
-                      onClick={() => {
-                        setAudioDeviceId(device.deviceId);
-                        setShowAudioDropdown(false);
-                      }}
-                      className={`${styles.cpDropdownItem} ${device.deviceId === audioDeviceId ? styles.cpDropdownItemActive : ''}`}
-                    >
-                      {device.label || `Microphone ${device.deviceId.slice(0, 8)}`}
-                    </button>
-                  ))}
+                  {devices
+                    .filter((device) => device.kind === 'audioinput')
+                    .map((device) => (
+                      <button
+                        key={device.deviceId}
+                        type="button"
+                        onClick={() => {
+                          setSelectedAudioDevice(device.deviceId);
+                          setShowAudioDropdown(false);
+                        }}
+                        className={`${styles.cpDropdownItem} ${
+                          device.deviceId === selectedAudioDevice ? styles.cpDropdownItemActive : ''
+                        }`}
+                      >
+                        {device.label || `Microphone ${device.deviceId.slice(0, 8)}`}
+                      </button>
+                    ))}
                 </div>
               )}
             </div>
@@ -180,9 +185,9 @@ export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProp
                   onClick={() => setVideoEnabled(!videoEnabled)}
                   className={styles.cpIconButton}
                 >
-                  <img 
-                    src={videoEnabled ? "/icons/cam_on.png" : "/icons/cam_off.png"} 
-                    alt="Camera" 
+                  <img
+                    src={videoEnabled ? '/icons/cam_on.png' : '/icons/cam_off.png'}
+                    alt="Camera"
                     className={styles.cpDeviceIcon}
                   />
                 </button>
@@ -192,36 +197,39 @@ export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProp
                   className={styles.cpDropdownButton}
                 >
                   <span className={styles.cpDeviceText}>
-                    {videoDevices.find((d) => d.deviceId === videoDeviceId)?.label || 'Camera'}
+                    {devices.find((d) => d.deviceId === selectedVideoDevice)?.label || 'Camera'}
                   </span>
                   <span className={styles.cpDropdownArrow}>▼</span>
                 </button>
               </div>
               {showVideoDropdown && (
                 <div className={styles.cpDropdown}>
-                  {videoDevices.map((device) => (
-                    <button
-                      key={device.deviceId}
-                      type="button"
-                      onClick={() => {
-                        setVideoDeviceId(device.deviceId);
-                        setShowVideoDropdown(false);
-                      }}
-                      className={`${styles.cpDropdownItem} ${device.deviceId === videoDeviceId ? styles.cpDropdownItemActive : ''}`}
-                    >
-                      {device.label || `Camera ${device.deviceId.slice(0, 8)}`}
-                    </button>
-                  ))}
+                  {devices
+                    .filter((device) => device.kind === 'videoinput')
+                    .map((device) => (
+                      <button
+                        key={device.deviceId}
+                        type="button"
+                        onClick={() => {
+                          setSelectedVideoDevice(device.deviceId);
+                          setShowVideoDropdown(false);
+                        }}
+                        className={`${styles.cpDropdownItem} ${
+                          device.deviceId === selectedVideoDevice ? styles.cpDropdownItemActive : ''
+                        }`}
+                      >
+                        {device.label || `Camera ${device.deviceId.slice(0, 8)}`}
+                      </button>
+                    ))}
                 </div>
               )}
             </div>
-
           </div>
 
           {/* Username Input */}
           <div className={styles.cpUsernameSection}>
             <div className={styles.cpUsernameInputContainer}>
-              <span className={styles.cpUserIconSmall}>👤</span>
+              <img src="/icons/user_sm.png" alt="User" className={styles.cpUserIconSmall} />
               <input
                 type="text"
                 value={username}
