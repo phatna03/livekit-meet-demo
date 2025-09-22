@@ -55,7 +55,11 @@ function DemoMeetingTab(props: { label: string }) {
   return (
     <div className={styles.tabContent}>
       <p style={{ margin: 0, textAlign: 'center' }}>Video calls and meetings for everyone</p>
-      <button style={{ marginTop: '1rem', marginBottom: '1rem' }} className="lk-button" onClick={startMeeting}>
+      <button
+        style={{ marginTop: '1rem', marginBottom: '1rem' }}
+        className="lk-button"
+        onClick={startMeeting}
+      >
         Start Meeting
       </button>
       <p style={{ margin: 0 }}>Connect, collaborate, and celebrate from anywhere with ig3 Meet</p>
@@ -165,14 +169,14 @@ export default function Page() {
   const router = useRouter();
   const [joinLink, setJoinLink] = useState('');
   const [joinError, setJoinError] = useState('');
-  
+
   const startMeeting = () => {
     router.push(`/rooms/${generateRoomId()}`);
   };
 
   const handleJoinMeeting = () => {
     setJoinError('');
-    
+
     if (!joinLink.trim()) {
       setJoinError('Please enter a meeting link');
       return;
@@ -181,7 +185,7 @@ export default function Page() {
     // Validate link format: [domain]/rooms/[room_name]
     const urlPattern = /^(https?:\/\/[^\/]+)?\/rooms\/([a-zA-Z0-9\-]+)$/;
     const match = joinLink.match(urlPattern);
-    
+
     if (!match) {
       setJoinError('Invalid meeting link format. Please use: /rooms/room-name');
       return;
@@ -203,7 +207,7 @@ export default function Page() {
     <>
       <main className={styles.hpMain} data-lk-theme="default">
         <div className={styles.hpBackgroundImage}></div>
-        
+
         {/* Header */}
         <header className={styles.hpHeader}>
           <h1 className={styles.hpTitle}>
@@ -216,13 +220,19 @@ export default function Page() {
         <div className={styles.hpContent}>
           <div className={styles.hpCard}>
             <p className={styles.hpCardTitle}>
-              Video calls and <br />meetings for everyone
+              Video calls and <br />
+              meetings for everyone
             </p>
             <p className={styles.hpCardDescription}>
-              Connect, collaborate, and celebrate from anywhere with <span className={styles.hpCardDescriptionHighlight}>iG3 Meet</span>
+              Connect, collaborate, and celebrate from anywhere with{' '}
+              <span className={styles.hpCardDescriptionHighlight}>iG3 Meet</span>
             </p>
             <button className={styles.hpStartButton} onClick={startMeeting}>
-              <img src="/icons/start_meeting.png" alt="Start Meeting" className={styles.hpStartButtonIcon} />
+              <img
+                src="/icons/start_meeting.png"
+                alt="Start Meeting"
+                className={styles.hpStartButtonIcon}
+              />
               Start Meeting
             </button>
 
@@ -248,11 +258,7 @@ export default function Page() {
                   Join
                 </button>
               </div>
-              {joinError && (
-                <div className={styles.hpJoinError}>
-                  {joinError}
-                </div>
-              )}
+              {joinError && <div className={styles.hpJoinError}>{joinError}</div>}
             </div>
           </div>
         </div>
@@ -267,7 +273,11 @@ export default function Page() {
               <img src="/icons/footer_x.png" alt="Twitter" className={styles.hpSocialIconIcon} />
             </a>
             <a href="#" className={styles.hpSocialIcon} aria-label="Discord">
-              <img src="/icons/footer_discord.png" alt="Twitter" className={styles.hpSocialIconIcon} />
+              <img
+                src="/icons/footer_discord.png"
+                alt="Twitter"
+                className={styles.hpSocialIconIcon}
+              />
             </a>
             <a href="#" className={styles.hpSocialIcon} aria-label="Facebook">
               <img src="/icons/footer_chat.png" alt="Twitter" className={styles.hpSocialIconIcon} />

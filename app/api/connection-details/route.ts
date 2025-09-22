@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     const metadata = request.nextUrl.searchParams.get('metadata') ?? '';
     const region = request.nextUrl.searchParams.get('region');
     const serverType = request.nextUrl.searchParams.get('serverType') || 'custom';
-    
+
     console.log('API Route - Environment variables:', {
       BACKEND_API_URL,
       LIVEKIT_URL,
@@ -39,9 +39,9 @@ export async function GET(request: NextRequest) {
       API_SECRET: API_SECRET ? '***' : 'undefined',
       roomName,
       participantName,
-      serverType
+      serverType,
     });
-    
+
     let randomParticipantPostfix = request.cookies.get(COOKIE_KEY)?.value;
 
     if (typeof roomName !== 'string') {
@@ -61,12 +61,14 @@ export async function GET(request: NextRequest) {
     if (serverType === 'livekit') {
       // LiveKit Server mode - tạo token trực tiếp
       console.log('Using LiveKit server directly...');
-      
+
       if (!LIVEKIT_URL) {
         throw new Error('LIVEKIT_URL is not defined');
       }
       if (!API_KEY || !API_SECRET) {
-        throw new Error('LIVEKIT_API_KEY and LIVEKIT_API_SECRET are required for LiveKit server mode');
+        throw new Error(
+          'LIVEKIT_API_KEY and LIVEKIT_API_SECRET are required for LiveKit server mode',
+        );
       }
 
       const livekitServerUrl = region ? getLiveKitURL(LIVEKIT_URL, region) : LIVEKIT_URL;
@@ -93,7 +95,7 @@ export async function GET(request: NextRequest) {
     } else {
       // Custom Server mode - sử dụng backend API của team
       console.log('Using custom backend API...');
-      
+
       const backendResponse = await fetch(`${BACKEND_API_URL}/createToken`, {
         method: 'POST',
         headers: {
@@ -111,27 +113,27 @@ export async function GET(request: NextRequest) {
         throw new Error(`Backend API error: ${backendResponse.status} - ${errorText}`);
       }
 
-             const backendData = await backendResponse.json();
-             console.log('Backend API response:', backendData);
+      const backendData = await backendResponse.json();
+      console.log('Backend API response:', backendData);
 
-             // Fix server URL: convert https to wss if needed
-             let serverUrl = backendData.server_url || LIVEKIT_URL || 'wss://livekit.ig3.ai:7880';
-             if (serverUrl.startsWith('https://')) {
-               serverUrl = serverUrl.replace('https://', 'wss://');
-             }
+      // Fix server URL: convert https to wss if needed
+      let serverUrl = backendData.server_url || LIVEKIT_URL || 'wss://livekit.ig3.ai:7880';
+      if (serverUrl.startsWith('https://')) {
+        serverUrl = serverUrl.replace('https://', 'wss://');
+      }
 
-             console.log('Final server URL:', serverUrl);
+      console.log('Final server URL:', serverUrl);
 
-             data = {
-               serverUrl: serverUrl,
-               roomName: roomName,
-               participantToken: backendData.participant_token,
-               participantName: participantName,
-             };
+      data = {
+        serverUrl: serverUrl,
+        roomName: roomName,
+        participantToken: backendData.participant_token,
+        participantName: participantName,
+      };
     }
-    
+
     console.log('API Route - Response data:', data);
-    
+
     return new NextResponse(JSON.stringify(data), {
       headers: {
         'Content-Type': 'application/json',

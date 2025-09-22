@@ -31,8 +31,7 @@ import { useSetupE2EE } from '@/lib/useSetupE2EE';
 import { useLowCPUOptimizer } from '@/lib/usePerfomanceOptimiser';
 import styles from '@/styles/Room.module.css';
 
-const CONN_BACKEND_ENDPOINT =
-  process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:3000';
+const CONN_BACKEND_ENDPOINT = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:3000';
 const CONN_DETAILS_ENDPOINT =
   process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT ?? '/api/connection-details';
 const SHOW_SETTINGS_MENU = process.env.NEXT_PUBLIC_SHOW_SETTINGS_MENU == 'true';
@@ -57,54 +56,58 @@ export function PageClientImpl(props: {
     undefined,
   );
 
-  const handlePreJoinSubmit = React.useCallback(async (values: LocalUserChoices, serverType: 'livekit' | 'custom') => {
-    setPreJoinChoices(values);
+  const handlePreJoinSubmit = React.useCallback(
+    async (values: LocalUserChoices, serverType: 'livekit' | 'custom') => {
+      setPreJoinChoices(values);
 
-    if (serverType === 'livekit') {
-      // LiveKit Server mode - gọi API route để tạo token
-      const livekitUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL || "wss://voicecmd-5kh2prv1.livekit.cloud";
-      
-      console.log('Environment variables:', {
-        NEXT_PUBLIC_LIVEKIT_URL: process.env.NEXT_PUBLIC_LIVEKIT_URL,
-        livekitUrl: livekitUrl
-      });
+      if (serverType === 'livekit') {
+        // LiveKit Server mode - gọi API route để tạo token
+        const livekitUrl =
+          process.env.NEXT_PUBLIC_LIVEKIT_URL || 'wss://voicecmd-5kh2prv1.livekit.cloud';
 
-      if (!livekitUrl) {
-        alert('LIVEKIT_URL is not configured. Please check environment variables.');
-        return;
-      }
+        console.log('Environment variables:', {
+          NEXT_PUBLIC_LIVEKIT_URL: process.env.NEXT_PUBLIC_LIVEKIT_URL,
+          livekitUrl: livekitUrl,
+        });
 
-      // Gọi API để tạo token từ LiveKit server
-      const url = new URL(CONN_DETAILS_ENDPOINT, CONN_BACKEND_ENDPOINT);
-      url.searchParams.append('roomName', props.roomName);
-      url.searchParams.append('participantName', values.username);
-      url.searchParams.append('serverType', 'livekit');
-      if (props.region) {
-        url.searchParams.append('region', props.region);
+        if (!livekitUrl) {
+          alert('LIVEKIT_URL is not configured. Please check environment variables.');
+          return;
+        }
+
+        // Gọi API để tạo token từ LiveKit server
+        const url = new URL(CONN_DETAILS_ENDPOINT, CONN_BACKEND_ENDPOINT);
+        url.searchParams.append('roomName', props.roomName);
+        url.searchParams.append('participantName', values.username);
+        url.searchParams.append('serverType', 'livekit');
+        if (props.region) {
+          url.searchParams.append('region', props.region);
+        }
+
+        console.log('LiveKit Server - Calling API:', url.toString());
+        const connectionDetailsResp = await fetch(url.toString());
+        const connectionDetailsData = await connectionDetailsResp.json();
+        console.log('LiveKit Server - API Response:', connectionDetailsData);
+        setConnectionDetails(connectionDetailsData);
+      } else {
+        // Custom Server mode - sử dụng backend API của team
+        const url = new URL(CONN_DETAILS_ENDPOINT, CONN_BACKEND_ENDPOINT);
+        url.searchParams.append('roomName', props.roomName);
+        url.searchParams.append('participantName', values.username);
+        url.searchParams.append('serverType', 'custom');
+        if (props.region) {
+          url.searchParams.append('region', props.region);
+        }
+
+        console.log('Custom Server - Calling API:', url.toString());
+        const connectionDetailsResp = await fetch(url.toString());
+        const connectionDetailsData = await connectionDetailsResp.json();
+        console.log('Custom Server - API Response:', connectionDetailsData);
+        setConnectionDetails(connectionDetailsData);
       }
-      
-      console.log('LiveKit Server - Calling API:', url.toString());
-      const connectionDetailsResp = await fetch(url.toString());
-      const connectionDetailsData = await connectionDetailsResp.json();
-      console.log('LiveKit Server - API Response:', connectionDetailsData);
-      setConnectionDetails(connectionDetailsData);
-    } else {
-      // Custom Server mode - sử dụng backend API của team
-      const url = new URL(CONN_DETAILS_ENDPOINT, CONN_BACKEND_ENDPOINT);
-      url.searchParams.append('roomName', props.roomName);
-      url.searchParams.append('participantName', values.username);
-      url.searchParams.append('serverType', 'custom');
-      if (props.region) {
-        url.searchParams.append('region', props.region);
-      }
-      
-      console.log('Custom Server - Calling API:', url.toString());
-      const connectionDetailsResp = await fetch(url.toString());
-      const connectionDetailsData = await connectionDetailsResp.json();
-      console.log('Custom Server - API Response:', connectionDetailsData);
-      setConnectionDetails(connectionDetailsData);
-    }
-  }, []);
+    },
+    [],
+  );
   const handlePreJoinError = React.useCallback((e: any) => console.error(e), []);
 
   return (

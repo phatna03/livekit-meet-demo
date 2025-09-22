@@ -21,15 +21,17 @@ export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProp
   const [videoDeviceId, setVideoDeviceId] = useState<string>('');
   const [audioDeviceId, setAudioDeviceId] = useState<string>('');
   const [serverType, setServerType] = useState<'livekit' | 'custom'>('custom');
+  const [showAudioDropdown, setShowAudioDropdown] = useState(false);
+  const [showVideoDropdown, setShowVideoDropdown] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Load available devices
   React.useEffect(() => {
     navigator.mediaDevices.enumerateDevices().then((devices) => {
       setDevices(devices);
-      const videoDevices = devices.filter(device => device.kind === 'videoinput');
-      const audioDevices = devices.filter(device => device.kind === 'audioinput');
-      
+      const videoDevices = devices.filter((device) => device.kind === 'videoinput');
+      const audioDevices = devices.filter((device) => device.kind === 'audioinput');
+
       if (videoDevices.length > 0) {
         setVideoDeviceId(videoDevices[0].deviceId);
       }
@@ -39,26 +41,45 @@ export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProp
     });
   }, []);
 
+  // Close dropdowns when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.cpDeviceControl')) {
+        setShowAudioDropdown(false);
+        setShowVideoDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   // Start camera preview
   React.useEffect(() => {
     if (videoEnabled && videoDeviceId) {
-      navigator.mediaDevices.getUserMedia({ 
-        video: { deviceId: videoDeviceId },
-        audio: false 
-      }).then((stream) => {
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-      }).catch((error) => {
-        console.error('Error accessing camera:', error);
-        onError(error);
-      });
+      navigator.mediaDevices
+        .getUserMedia({
+          video: { deviceId: videoDeviceId },
+          audio: false,
+        })
+        .then((stream) => {
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+          }
+        })
+        .catch((error) => {
+          console.error('Error accessing camera:', error);
+          onError(error);
+        });
     }
   }, [videoEnabled, videoDeviceId, onError]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!username.trim()) {
       alert('Please enter your name');
       return;
@@ -71,8 +92,8 @@ export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProp
         username: username.trim(),
         videoEnabled,
         audioEnabled,
-        videoDeviceId: videoDeviceId || undefined,
-        audioDeviceId: audioDeviceId || undefined,
+        videoDeviceId: videoDeviceId ? videoDeviceId : undefined,
+        audioDeviceId: audioDeviceId ? audioDeviceId : undefined,
       };
 
       onSubmit(values, serverType);
@@ -86,8 +107,8 @@ export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProp
     router.push('/');
   };
 
-  const videoDevices = devices.filter(device => device.kind === 'videoinput');
-  const audioDevices = devices.filter(device => device.kind === 'audioinput');
+  const videoDevices = devices.filter((device) => device.kind === 'videoinput');
+  const audioDevices = devices.filter((device) => device.kind === 'audioinput');
 
   return (
     <div className={styles.cpContainer}>
@@ -95,19 +116,14 @@ export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProp
         {/* Video Preview Area */}
         <div className={styles.cpVideoPreviewArea}>
           {videoEnabled ? (
-            <video
-              ref={videoRef}
-              autoPlay
-              muted
-              playsInline
-              className={styles.cpPreviewVideo}
-            />
+            <video ref={videoRef} autoPlay muted playsInline className={styles.cpPreviewVideo} />
           ) : (
             <div className={styles.cpVideoPlaceholder}>
-              <div className={styles.cpUserIcon}>👤</div>
+              <div className={styles.cpUserIcon}>
+                <img src="/icons/user.png" alt="User" />
+              </div>
             </div>
           )}
-          <div className={styles.cpSignalIndicator}>📶</div>
         </div>
 
         {/* Controls Section */}
@@ -117,25 +133,63 @@ export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProp
             <div className={styles.cpDeviceControl}>
               <button
                 type="button"
-                onClick={() => setAudioEnabled(!audioEnabled)}
+                onClick={() => setShowAudioDropdown(!showAudioDropdown)}
                 className={`${styles.cpDeviceBtn} ${!audioEnabled ? styles.disabled : ''}`}
               >
                 <span className={styles.cpDeviceIcon}>🎤</span>
-                <span className={styles.cpDeviceText}>Microphone opt</span>
+                <span className={styles.cpDeviceText}>
+                  {audioDevices.find((d) => d.deviceId === audioDeviceId)?.label || 'Microphone'}
+                </span>
                 <span className={styles.cpDropdownArrow}>▼</span>
               </button>
+              {showAudioDropdown && (
+                <div className={styles.cpDropdown}>
+                  {audioDevices.map((device) => (
+                    <button
+                      key={device.deviceId}
+                      type="button"
+                      onClick={() => {
+                        setAudioDeviceId(device.deviceId);
+                        setShowAudioDropdown(false);
+                      }}
+                      className={`${styles.cpDropdownItem} ${device.deviceId === audioDeviceId ? styles.cpDropdownItemActive : ''}`}
+                    >
+                      {device.label || `Microphone ${device.deviceId.slice(0, 8)}`}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className={styles.cpDeviceControl}>
               <button
                 type="button"
-                onClick={() => setVideoEnabled(!videoEnabled)}
+                onClick={() => setShowVideoDropdown(!showVideoDropdown)}
                 className={`${styles.cpDeviceBtn} ${!videoEnabled ? styles.disabled : ''}`}
               >
                 <span className={styles.cpDeviceIcon}>📹</span>
-                <span className={styles.cpDeviceText}>Camera opt</span>
+                <span className={styles.cpDeviceText}>
+                  {videoDevices.find((d) => d.deviceId === videoDeviceId)?.label || 'Camera'}
+                </span>
                 <span className={styles.cpDropdownArrow}>▼</span>
               </button>
+              {showVideoDropdown && (
+                <div className={styles.cpDropdown}>
+                  {videoDevices.map((device) => (
+                    <button
+                      key={device.deviceId}
+                      type="button"
+                      onClick={() => {
+                        setVideoDeviceId(device.deviceId);
+                        setShowVideoDropdown(false);
+                      }}
+                      className={`${styles.cpDropdownItem} ${device.deviceId === videoDeviceId ? styles.cpDropdownItemActive : ''}`}
+                    >
+                      {device.label || `Camera ${device.deviceId.slice(0, 8)}`}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -182,11 +236,7 @@ export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProp
 
           {/* Action Buttons */}
           <div className={styles.cpActionButtons}>
-            <button
-              type="button"
-              onClick={handleCancel}
-              className={styles.cpCancelButton}
-            >
+            <button type="button" onClick={handleCancel} className={styles.cpCancelButton}>
               Cancel
             </button>
             <button
@@ -200,7 +250,6 @@ export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProp
           </div>
         </div>
       </div>
-
     </div>
   );
 }

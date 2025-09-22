@@ -22,14 +22,17 @@ NEXT_PUBLIC_SHOW_SETTINGS_MENU=true
 ## Giải thích các biến:
 
 ### Backend API (cho Custom Server):
+
 - `BACKEND_API_URL`: URL của API backend để tạo token
 
 ### LiveKit Server (cho LiveKit Server):
+
 - `LIVEKIT_URL`: URL của LiveKit server (server-side)
 - `LIVEKIT_API_KEY`: API key của LiveKit server (server-side)
 - `LIVEKIT_API_SECRET`: API secret của LiveKit server (server-side)
 
 ### Frontend Configuration:
+
 - `NEXT_PUBLIC_LIVEKIT_URL`: URL của LiveKit server (client-side)
 - `NEXT_PUBLIC_BACKEND_URL`: URL của frontend
 - `NEXT_PUBLIC_SHOW_SETTINGS_MENU`: Hiển thị menu settings
@@ -37,6 +40,7 @@ NEXT_PUBLIC_SHOW_SETTINGS_MENU=true
 ## Flow hoạt động:
 
 ### Custom Server Mode:
+
 1. User chọn "Custom Server" trong PreJoin
 2. Frontend gọi Next.js API route: `http://localhost:3000/api/connection-details?serverType=custom`
 3. Next.js API route gọi backend API: `https://livekit-token.ig3.ai/createToken`
@@ -44,6 +48,7 @@ NEXT_PUBLIC_SHOW_SETTINGS_MENU=true
 5. Next.js API route trả về cho frontend: `{ serverUrl, participantToken, roomName, participantName }`
 
 ### LiveKit Server Mode:
+
 1. User chọn "LiveKit Server" trong PreJoin
 2. Frontend gọi Next.js API route: `http://localhost:3000/api/connection-details?serverType=livekit`
 3. Next.js API route tạo token trực tiếp từ LiveKit server

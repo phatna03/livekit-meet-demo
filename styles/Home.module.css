@@ -274,40 +274,40 @@
   .hpBackgroundImage {
     background-size: auto;
   }
-  
+
   .hpTitle {
     font-size: 2rem;
     letter-spacing: 1px;
   }
-  
+
   .hpHeader {
     top: 1rem;
   }
-  
+
   .hpCard {
     padding: 0;
   }
-  
+
   .hpCardDescription {
     font-size: 1rem;
   }
-  
+
   .hpStartButton {
     /* padding: 0.8rem 2rem; */
     font-size: 1rem;
   }
-  
+
   .hpFooter {
     flex-direction: column;
     gap: 1rem;
     text-align: center;
     padding: 1rem;
   }
-  
+
   .hpFooterLeft p {
     font-size: 0.8rem;
   }
-  
+
   .hpFooterRight {
     gap: 1.5rem;
   }
