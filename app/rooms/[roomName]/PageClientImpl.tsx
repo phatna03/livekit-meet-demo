@@ -29,6 +29,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { useSetupE2EE } from '@/lib/useSetupE2EE';
 import { useLowCPUOptimizer } from '@/lib/usePerfomanceOptimiser';
+import styles from '@/styles/Room.module.css';
 
 const CONN_BACKEND_ENDPOINT =
   process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:3000';
@@ -107,20 +108,25 @@ export function PageClientImpl(props: {
   const handlePreJoinError = React.useCallback((e: any) => console.error(e), []);
 
   return (
-    <main data-lk-theme="default" style={{ height: '100%' }}>
-      {connectionDetails === undefined || preJoinChoices === undefined ? (
-        <CustomPreJoin
-          defaults={preJoinDefaults}
-          onSubmit={handlePreJoinSubmit}
-          onError={handlePreJoinError}
-        />
-      ) : (
-        <VideoConferenceComponent
-          connectionDetails={connectionDetails}
-          userChoices={preJoinChoices}
-          options={{ codec: props.codec, hq: props.hq }}
-        />
-      )}
+    <main className={styles.rpMain} data-lk-theme="default">
+      <div className={styles.rpBackgroundImage}></div>
+
+      {/* Content */}
+      <div className={styles.rpContent}>
+        {connectionDetails === undefined || preJoinChoices === undefined ? (
+          <CustomPreJoin
+            defaults={preJoinDefaults}
+            onSubmit={handlePreJoinSubmit}
+            onError={handlePreJoinError}
+          />
+        ) : (
+          <VideoConferenceComponent
+            connectionDetails={connectionDetails}
+            userChoices={preJoinChoices}
+            options={{ codec: props.codec, hq: props.hq }}
+          />
+        )}
+      </div>
     </main>
   );
 }
