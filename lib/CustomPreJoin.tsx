@@ -131,17 +131,29 @@ export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProp
           {/* Device Controls */}
           <div className={styles.cpDeviceControls}>
             <div className={styles.cpDeviceControl}>
-              <button
-                type="button"
-                onClick={() => setShowAudioDropdown(!showAudioDropdown)}
-                className={`${styles.cpDeviceBtn} ${!audioEnabled ? styles.disabled : ''}`}
-              >
-                <span className={styles.cpDeviceIcon}>🎤</span>
-                <span className={styles.cpDeviceText}>
-                  {audioDevices.find((d) => d.deviceId === audioDeviceId)?.label || 'Microphone'}
-                </span>
-                <span className={styles.cpDropdownArrow}>▼</span>
-              </button>
+              <div className={styles.cpDeviceHeader}>
+                <button
+                  type="button"
+                  onClick={() => setAudioEnabled(!audioEnabled)}
+                  className={styles.cpIconButton}
+                >
+                  <img 
+                    src={audioEnabled ? "/icons/mic_on.png" : "/icons/mic_off.png"} 
+                    alt="Microphone" 
+                    className={styles.cpDeviceIcon}
+                  />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowAudioDropdown(!showAudioDropdown)}
+                  className={styles.cpDropdownButton}
+                >
+                  <span className={styles.cpDeviceText}>
+                    {audioDevices.find((d) => d.deviceId === audioDeviceId)?.label || 'Microphone'}
+                  </span>
+                  <span className={styles.cpDropdownArrow}>▼</span>
+                </button>
+              </div>
               {showAudioDropdown && (
                 <div className={styles.cpDropdown}>
                   {audioDevices.map((device) => (
@@ -162,17 +174,29 @@ export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProp
             </div>
 
             <div className={styles.cpDeviceControl}>
-              <button
-                type="button"
-                onClick={() => setShowVideoDropdown(!showVideoDropdown)}
-                className={`${styles.cpDeviceBtn} ${!videoEnabled ? styles.disabled : ''}`}
-              >
-                <span className={styles.cpDeviceIcon}>📹</span>
-                <span className={styles.cpDeviceText}>
-                  {videoDevices.find((d) => d.deviceId === videoDeviceId)?.label || 'Camera'}
-                </span>
-                <span className={styles.cpDropdownArrow}>▼</span>
-              </button>
+              <div className={styles.cpDeviceHeader}>
+                <button
+                  type="button"
+                  onClick={() => setVideoEnabled(!videoEnabled)}
+                  className={styles.cpIconButton}
+                >
+                  <img 
+                    src={videoEnabled ? "/icons/cam_on.png" : "/icons/cam_off.png"} 
+                    alt="Camera" 
+                    className={styles.cpDeviceIcon}
+                  />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowVideoDropdown(!showVideoDropdown)}
+                  className={styles.cpDropdownButton}
+                >
+                  <span className={styles.cpDeviceText}>
+                    {videoDevices.find((d) => d.deviceId === videoDeviceId)?.label || 'Camera'}
+                  </span>
+                  <span className={styles.cpDropdownArrow}>▼</span>
+                </button>
+              </div>
               {showVideoDropdown && (
                 <div className={styles.cpDropdown}>
                   {videoDevices.map((device) => (
@@ -191,6 +215,7 @@ export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProp
                 </div>
               )}
             </div>
+
           </div>
 
           {/* Username Input */}

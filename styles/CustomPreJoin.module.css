@@ -60,14 +60,55 @@
 }
 
 .cpDeviceControls {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 16px;
   margin-bottom: 20px;
 }
 
 .cpDeviceControl {
-  flex: 1;
   position: relative;
+}
+
+.cpDeviceHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #3a3a3a;
+  border: 1px solid #555;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.cpIconButton {
+  background: transparent;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.cpIconButton:hover {
+  background: #4a4a4a;
+}
+
+.cpDropdownButton {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.cpDropdownButton:hover {
+  background: #4a4a4a;
 }
 
 .cpDeviceBtn {
@@ -93,13 +134,19 @@
 }
 
 .cpDeviceIcon {
-  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
 }
 
 .cpDeviceText {
   flex: 1;
   text-align: left;
   font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .cpDropdownArrow {
@@ -257,7 +304,16 @@
   }
 
   .cpDeviceControls {
+    grid-template-columns: 1fr;
+  }
+
+  .cpDeviceHeader {
     flex-direction: column;
+    gap: 12px;
+  }
+
+  .cpDeviceText {
+    max-width: 100%;
   }
 
   .cpRadioGroup {
