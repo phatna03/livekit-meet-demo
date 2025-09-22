@@ -270,6 +270,10 @@
     padding: 1rem;
     max-width: 90%;
   }
+
+  .hpBackgroundImage {
+    background-size: auto;
+  }
   
   .hpTitle {
     font-size: 2rem;
@@ -281,7 +285,7 @@
   }
   
   .hpCard {
-    padding: 2rem;
+    padding: 0;
   }
   
   .hpCardDescription {
@@ -289,7 +293,7 @@
   }
   
   .hpStartButton {
-    padding: 0.8rem 2rem;
+    /* padding: 0.8rem 2rem; */
     font-size: 1rem;
   }
   
@@ -309,9 +313,9 @@
   }
 
   .hpJoinInputContainer {
-    flex-direction: column;
+    /* flex-direction: column;
     gap: 1rem;
-    padding: 1rem;
+    padding: 1rem; */
   }
 
   .hpJoinInput {
@@ -320,7 +324,7 @@
   }
 
   .hpJoinButton {
-    width: 100%;
+    /* width: 100%; */
   }
 
   .hpOrSeparator {
