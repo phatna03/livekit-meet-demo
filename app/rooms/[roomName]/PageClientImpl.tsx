@@ -10,10 +10,10 @@ import { ConnectionDetails } from '@/lib/types';
 import {
   formatChatMessageLinks,
   LocalUserChoices,
-  PreJoin,
   RoomContext,
   VideoConference,
 } from '@livekit/components-react';
+import { CustomPreJoin } from '@/lib/CustomPreJoin';
 import {
   ExternalE2EEKeyProvider,
   RoomOptions,
@@ -30,6 +30,8 @@ import { useRouter } from 'next/navigation';
 import { useSetupE2EE } from '@/lib/useSetupE2EE';
 import { useLowCPUOptimizer } from '@/lib/usePerfomanceOptimiser';
 
+const CONN_BACKEND_ENDPOINT =
+  process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:3000';
 const CONN_DETAILS_ENDPOINT =
   process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT ?? '/api/connection-details';
 const SHOW_SETTINGS_MENU = process.env.NEXT_PUBLIC_SHOW_SETTINGS_MENU == 'true';
@@ -54,46 +56,64 @@ export function PageClientImpl(props: {
     undefined,
   );
 
-  const handlePreJoinSubmit = React.useCallback(async (values: LocalUserChoices) => {
+  const handlePreJoinSubmit = React.useCallback(async (values: LocalUserChoices, serverType: 'livekit' | 'custom') => {
     setPreJoinChoices(values);
 
-  // Kiểm tra nếu có token hardcode trong env thì dùng luôn
-  const hardcodeToken = process.env.NEXT_PUBLIC_LIVEKIT_TOKEN;
-  const hardcodeServerUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL;
+    if (serverType === 'livekit') {
+      // LiveKit Server mode - gọi API route để tạo token
+      const livekitUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL || "wss://voicecmd-5kh2prv1.livekit.cloud";
+      
+      console.log('Environment variables:', {
+        NEXT_PUBLIC_LIVEKIT_URL: process.env.NEXT_PUBLIC_LIVEKIT_URL,
+        livekitUrl: livekitUrl
+      });
 
-  if (hardcodeToken && hardcodeServerUrl) {
-    setConnectionDetails({
-      serverUrl: hardcodeServerUrl,
-      roomName: props.roomName,
-      participantToken: hardcodeToken,
-      participantName: values.username,
-    });
-    return;
-  }
+      if (!livekitUrl) {
+        alert('LIVEKIT_URL is not configured. Please check environment variables.');
+        return;
+      }
 
-  // Production flow: Gọi API backend để xin token
-    const url = new URL(CONN_DETAILS_ENDPOINT, window.location.origin);
-    url.searchParams.append('roomName', props.roomName);
-    url.searchParams.append('participantName', values.username);
-    if (props.region) {
-      url.searchParams.append('region', props.region);
+      // Gọi API để tạo token từ LiveKit server
+      const url = new URL(CONN_DETAILS_ENDPOINT, CONN_BACKEND_ENDPOINT);
+      url.searchParams.append('roomName', props.roomName);
+      url.searchParams.append('participantName', values.username);
+      url.searchParams.append('serverType', 'livekit');
+      if (props.region) {
+        url.searchParams.append('region', props.region);
+      }
+      
+      console.log('LiveKit Server - Calling API:', url.toString());
+      const connectionDetailsResp = await fetch(url.toString());
+      const connectionDetailsData = await connectionDetailsResp.json();
+      console.log('LiveKit Server - API Response:', connectionDetailsData);
+      setConnectionDetails(connectionDetailsData);
+    } else {
+      // Custom Server mode - sử dụng backend API của team
+      const url = new URL(CONN_DETAILS_ENDPOINT, CONN_BACKEND_ENDPOINT);
+      url.searchParams.append('roomName', props.roomName);
+      url.searchParams.append('participantName', values.username);
+      url.searchParams.append('serverType', 'custom');
+      if (props.region) {
+        url.searchParams.append('region', props.region);
+      }
+      
+      console.log('Custom Server - Calling API:', url.toString());
+      const connectionDetailsResp = await fetch(url.toString());
+      const connectionDetailsData = await connectionDetailsResp.json();
+      console.log('Custom Server - API Response:', connectionDetailsData);
+      setConnectionDetails(connectionDetailsData);
     }
-    const connectionDetailsResp = await fetch(url.toString());
-    const connectionDetailsData = await connectionDetailsResp.json();
-    setConnectionDetails(connectionDetailsData);
   }, []);
   const handlePreJoinError = React.useCallback((e: any) => console.error(e), []);
 
   return (
     <main data-lk-theme="default" style={{ height: '100%' }}>
       {connectionDetails === undefined || preJoinChoices === undefined ? (
-        <div style={{ display: 'grid', placeItems: 'center', height: '100%' }}>
-          <PreJoin
-            defaults={preJoinDefaults}
-            onSubmit={handlePreJoinSubmit}
-            onError={handlePreJoinError}
-          />
-        </div>
+        <CustomPreJoin
+          defaults={preJoinDefaults}
+          onSubmit={handlePreJoinSubmit}
+          onError={handlePreJoinError}
+        />
       ) : (
         <VideoConferenceComponent
           connectionDetails={connectionDetails}

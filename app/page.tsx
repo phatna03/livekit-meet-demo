@@ -172,7 +172,7 @@ export default function Page() {
         </div>
 
         <DemoMeetingTab label="Demo" />
-        
+        {/* <CustomConnectionTab label="Custom" /> */}
       </main>
     </>
   );
