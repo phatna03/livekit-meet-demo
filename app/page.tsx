@@ -184,8 +184,11 @@ export default function Page() {
         {/* Content */}
         <div className={styles.hpContent}>
           <div className={styles.hpCard}>
+            <p className={styles.hpCardTitle}>
+              Video calls and <br />meetings for everyone
+            </p>
             <p className={styles.hpCardDescription}>
-              Connect, collaborate, and celebrate from anywhere with ig3 Meet
+              Connect, collaborate, and celebrate from anywhere with <span className={styles.hpCardDescriptionHighlight}>iG3 Meet</span>
             </p>
             <button className={styles.hpStartButton} onClick={startMeeting}>
               Start Meeting
