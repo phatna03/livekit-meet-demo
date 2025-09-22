@@ -119,19 +119,6 @@ export async function GET(request: NextRequest) {
              if (serverUrl.startsWith('https://')) {
                serverUrl = serverUrl.replace('https://', 'wss://');
              }
-             
-             // Try different port combinations for LiveKit
-             if (serverUrl.includes('livekit.ig3.ai')) {
-               // Try common LiveKit ports - test port 443 (standard HTTPS/WSS)
-               if (serverUrl.includes(':7880')) {
-                 serverUrl = 'wss://livekit.ig3.ai:443'; // Try standard HTTPS port
-               } else if (serverUrl.includes(':7881')) {
-                 serverUrl = 'wss://livekit.ig3.ai:443';
-               } else {
-                 // Try port 443 first (standard HTTPS/WSS port)
-                 serverUrl = 'wss://livekit.ig3.ai:443';
-               }
-             }
 
              console.log('Final server URL:', serverUrl);
 
