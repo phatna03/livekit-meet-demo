@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { LocalUserChoices, TrackToggle } from '@livekit/components-react';
 import { Track } from 'livekit-client';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import styles from '../styles/CustomPreJoin.module.css';
 
 interface CustomPreJoinProps {
@@ -12,34 +12,42 @@ interface CustomPreJoinProps {
   onError: (error: any) => void;
 }
 
-export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProps) {
+function CustomPreJoinComponent({ defaults, onSubmit, onError }: CustomPreJoinProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [username, setUsername] = useState(defaults.username || '');
   const [videoEnabled, setVideoEnabled] = useState(defaults.videoEnabled ?? true);
   const [audioEnabled, setAudioEnabled] = useState(defaults.audioEnabled ?? true);
   const [isJoining, setIsJoining] = useState(false);
-  const [serverType, setServerType] = useState<'livekit' | 'custom'>('custom');
-  const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
+  const [serverType, setServerType] = useState<'livekit' | 'custom'>('livekit');
+  const [devices, setDevices] = useState<any[]>([]);
   const [selectedAudioDevice, setSelectedAudioDevice] = useState<string>('');
   const [selectedVideoDevice, setSelectedVideoDevice] = useState<string>('');
   const [showAudioDropdown, setShowAudioDropdown] = useState(false);
   const [showVideoDropdown, setShowVideoDropdown] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  // Check if debug mode is enabled
+  const isDebugMode = searchParams.get('debug') === '1';
+
   // Load available devices
   useEffect(() => {
-    navigator.mediaDevices.enumerateDevices().then((devices) => {
-      setDevices(devices);
-      const audioDevices = devices.filter((device) => device.kind === 'audioinput');
-      const videoDevices = devices.filter((device) => device.kind === 'videoinput');
+    if (typeof navigator !== 'undefined' && navigator.mediaDevices) {
+      navigator.mediaDevices.enumerateDevices().then((devices) => {
+        setDevices(devices);
+        const audioDevices = devices.filter((device) => device.kind === 'audioinput');
+        const videoDevices = devices.filter((device) => device.kind === 'videoinput');
 
-      if (audioDevices.length > 0) {
-        setSelectedAudioDevice(audioDevices[0].deviceId);
-      }
-      if (videoDevices.length > 0) {
-        setSelectedVideoDevice(videoDevices[0].deviceId);
-      }
-    });
+        if (audioDevices.length > 0) {
+          setSelectedAudioDevice(audioDevices[0].deviceId);
+        }
+        if (videoDevices.length > 0) {
+          setSelectedVideoDevice(videoDevices[0].deviceId);
+        }
+      }).catch((error) => {
+        console.error('Error loading devices:', error);
+      });
+    }
   }, []);
 
   // Close dropdowns when clicking outside
@@ -60,7 +68,7 @@ export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProp
 
   // Start camera preview
   React.useEffect(() => {
-    if (videoEnabled && videoRef.current) {
+    if (videoEnabled && videoRef.current && typeof navigator !== 'undefined' && navigator.mediaDevices) {
       navigator.mediaDevices
         .getUserMedia({
           video: true,
@@ -157,7 +165,7 @@ export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProp
               </div>
               {showAudioDropdown && (
                 <div className={styles.cpDropdown}>
-                  {devices
+                  {devices.length > 0 ? devices
                     .filter((device) => device.kind === 'audioinput')
                     .map((device) => (
                       <button
@@ -173,7 +181,9 @@ export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProp
                       >
                         {device.label || `Microphone ${device.deviceId.slice(0, 8)}`}
                       </button>
-                    ))}
+                    )) : (
+                      <div className={styles.cpDropdownItem}>No devices available</div>
+                    )}
                 </div>
               )}
             </div>
@@ -204,7 +214,7 @@ export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProp
               </div>
               {showVideoDropdown && (
                 <div className={styles.cpDropdown}>
-                  {devices
+                  {devices.length > 0 ? devices
                     .filter((device) => device.kind === 'videoinput')
                     .map((device) => (
                       <button
@@ -220,7 +230,9 @@ export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProp
                       >
                         {device.label || `Camera ${device.deviceId.slice(0, 8)}`}
                       </button>
-                    ))}
+                    )) : (
+                      <div className={styles.cpDropdownItem}>No devices available</div>
+                    )}
                 </div>
               )}
             </div>
@@ -241,31 +253,33 @@ export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProp
             </div>
           </div>
 
-          {/* Server Type Selection */}
-          <div className={styles.cpServerSelection}>
-            <div className={styles.cpRadioGroup}>
-              <label className={styles.cpRadioOption}>
-                <input
-                  type="radio"
-                  name="serverType"
-                  value="livekit"
-                  checked={serverType === 'livekit'}
-                  onChange={(e) => setServerType(e.target.value as 'livekit' | 'custom')}
-                />
-                <span className={styles.cpRadioLabel}>LiveKit Server</span>
-              </label>
-              <label className={styles.cpRadioOption}>
-                <input
-                  type="radio"
-                  name="serverType"
-                  value="custom"
-                  checked={serverType === 'custom'}
-                  onChange={(e) => setServerType(e.target.value as 'livekit' | 'custom')}
-                />
-                <span className={styles.cpRadioLabel}>Custom Server</span>
-              </label>
+          {/* Server Type Selection - Only show in debug mode */}
+          {isDebugMode && (
+            <div className={styles.cpServerSelection}>
+              <div className={styles.cpRadioGroup}>
+                <label className={styles.cpRadioOption}>
+                  <input
+                    type="radio"
+                    name="serverType"
+                    value="livekit"
+                    checked={serverType === 'livekit'}
+                    onChange={(e) => setServerType(e.target.value as 'livekit' | 'custom')}
+                  />
+                  <span className={styles.cpRadioLabel}>LiveKit Server</span>
+                </label>
+                <label className={styles.cpRadioOption}>
+                  <input
+                    type="radio"
+                    name="serverType"
+                    value="custom"
+                    checked={serverType === 'custom'}
+                    onChange={(e) => setServerType(e.target.value as 'livekit' | 'custom')}
+                  />
+                  <span className={styles.cpRadioLabel}>Custom Server</span>
+                </label>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Action Buttons */}
           <div className={styles.cpActionButtons}>
@@ -284,5 +298,13 @@ export function CustomPreJoin({ defaults, onSubmit, onError }: CustomPreJoinProp
         </div>
       </div>
     </div>
+  );
+}
+
+export function CustomPreJoin(props: CustomPreJoinProps) {
+  return (
+    <React.Suspense fallback={<div>Loading...</div>}>
+      <CustomPreJoinComponent {...props} />
+    </React.Suspense>
   );
 }
