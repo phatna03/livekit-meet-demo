@@ -5,6 +5,7 @@ import { LocalUserChoices, TrackToggle } from '@livekit/components-react';
 import { Track } from 'livekit-client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import styles from '../styles/CustomPreJoin.module.css';
+import { encodePassphrase, randomString } from '@/lib/client-utils';
 
 interface CustomPreJoinProps {
   defaults: Partial<LocalUserChoices>;
@@ -26,6 +27,8 @@ function CustomPreJoinComponent({ defaults, onSubmit, onError }: CustomPreJoinPr
   const [showAudioDropdown, setShowAudioDropdown] = useState(false);
   const [showVideoDropdown, setShowVideoDropdown] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [e2ee, setE2ee] = useState(false);
+  const [sharedPassphrase, setSharedPassphrase] = useState(randomString(64));
 
   // Check if debug mode is enabled
   const isDebugMode = searchParams.get('debug') === '1';
@@ -114,7 +117,7 @@ function CustomPreJoinComponent({ defaults, onSubmit, onError }: CustomPreJoinPr
     e.preventDefault();
 
     if (!username.trim()) {
-      alert('Please enter your name');
+      // alert('Please enter your name');
       return;
     }
 

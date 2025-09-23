@@ -5,6 +5,14 @@ const nextConfig = {
   images: {
     formats: ['image/webp'],
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/livekit-token/:path*',
+        destination: 'http://livekit-token.ig3.ai/:path*',
+      },
+    ];
+  },
   webpack: (config, { buildId, dev, isServer, defaultLoaders, nextRuntime, webpack }) => {
     // Important: return the modified config
     config.module.rules.push({

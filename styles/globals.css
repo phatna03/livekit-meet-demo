@@ -65,3 +65,38 @@ h2 a {
 h2 a {
   text-decoration: none;
 }
+
+/* LiveKit Global Overrides - Minimal approach */
+.lk-room-container {
+  width: 100vw !important;
+  height: 100vh !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  background: #000 !important;
+  overflow: hidden !important;
+  z-index: 1 !important;
+}
+
+/* Hide text labels in control bar buttons only */
+.lk-room-container .lk-control-bar .lk-button .lk-button-label,
+.lk-room-container .lk-control-bar .lk-button span:not(svg),
+.lk-room-container .lk-control-bar .lk-button [class*="label"],
+.lk-room-container .lk-control-bar .lk-button .lk-text {
+  display: none !important;
+}
+
+/* Force hide all text in control bar buttons */
+.lk-room-container .lk-control-bar .lk-button {
+  font-size: 0 !important;
+  line-height: 0 !important;
+}
+
+/* Show only icons in control bar buttons */
+.lk-room-container .lk-control-bar .lk-button svg,
+.lk-room-container .lk-control-bar .lk-button i,
+.lk-room-container .lk-control-bar .lk-button [class*="icon"] {
+  font-size: initial !important;
+  line-height: initial !important;
+  display: block !important;
+}

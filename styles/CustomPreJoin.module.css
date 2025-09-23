@@ -388,21 +388,45 @@
   }
 
   .cpDeviceHeader {
-    flex-direction: column;
+    flex-direction: row;
     gap: 12px;
+    align-items: center;
   }
 
   .cpDeviceText {
     max-width: 100%;
   }
 
+  .cpDeviceIcon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+
+  .cpMeetingIcon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+
+  .cpUserIconSmall {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+
+  .cpCopyIcon {
+    width: 14px;
+    height: 14px;
+  }
+
   .cpRoomUrlInputContainer {
-    flex-direction: column;
+    flex-direction: row;
     gap: 8px;
   }
 
   .cpCopyButton {
-    align-self: flex-end;
+    align-self: center;
   }
 
   .cpRadioGroup {
@@ -411,7 +435,16 @@
   }
 
   .cpActionButtons {
-    flex-direction: column;
+    flex-direction: row;
+    gap: 12px;
+  }
+
+  .cpCancelButton {
+    flex: 1;
+  }
+
+  .cpJoinButton {
+    flex: 1;
   }
 }
 
@@ -422,9 +455,10 @@
   }
 
   .cpDeviceHeader {
-    flex-direction: column;
+    flex-direction: row;
     gap: 12px;
     padding: 12px;
+    align-items: center;
   }
 
   .cpDropdownButton {
@@ -435,5 +469,18 @@
   .cpDeviceText {
     max-width: calc(100% - 30px);
     font-size: 13px;
+  }
+
+  .cpActionButtons {
+    flex-direction: row;
+    gap: 12px;
+  }
+
+  .cpCancelButton {
+    flex: 1;
+  }
+
+  .cpJoinButton {
+    flex: 1;
   }
 }
