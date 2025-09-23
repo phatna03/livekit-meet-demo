@@ -78,25 +78,54 @@ h2 a {
   z-index: 1 !important;
 }
 
-/* Hide text labels in control bar buttons only */
-.lk-room-container .lk-control-bar .lk-button .lk-button-label,
-.lk-room-container .lk-control-bar .lk-button span:not(svg),
-.lk-room-container .lk-control-bar .lk-button [class*="label"],
-.lk-room-container .lk-control-bar .lk-button .lk-text {
-  display: none !important;
-}
-
-/* Force hide all text in control bar buttons */
+.lk-room-container .lk-control-bar .lk-disconnect-button,
 .lk-room-container .lk-control-bar .lk-button {
-  font-size: 0 !important;
-  line-height: 0 !important;
+  font-size: 0;
+
+  display: grid;
+  place-items: center;
+  align-items: center;
+  justify-content: center;
+}
+.lk-room-container .lk-control-bar .lk-disconnect-button svg,
+.lk-room-container .lk-control-bar .lk-button svg {
+  position: relative;
+  top: 5px;
+}
+.lk-room-container .lk-control-bar .lk-button-group-menu .lk-button {
+  font-size: inherit !important;
+  justify-content: start;
+}
+.lk-media-device-select [data-lk-active=true]>.lk-button {
+  background-color: #f96418 !important;
 }
 
-/* Show only icons in control bar buttons */
-.lk-room-container .lk-control-bar .lk-button svg,
-.lk-room-container .lk-control-bar .lk-button i,
-.lk-room-container .lk-control-bar .lk-button [class*="icon"] {
-  font-size: initial !important;
-  line-height: initial !important;
-  display: block !important;
+.lk-chat .lk-chat-form .lk-button {
+  background-color: #f96418;
+}
+.lk-chat .lk-chat-form .lk-button:not(:disabled):hover {
+  background-color: #f96418 !important;
+}
+.lk-chat .lk-chat-entry .lk-message-body {
+  border-radius: 0.5rem !important;
+  margin-top: 0 !important;
+}
+.lk-chat .lk-chat-entry[data-lk-message-origin=local] .lk-participant-name {
+  color: #f96418 !important;
+}
+.lk-chat .lk-chat-entry[data-lk-message-origin=local] .lk-message-body {
+  background-color: #f96418 !important;
+}
+.lk-chat .lk-chat-entry[data-lk-message-origin=remote] .lk-participant-name {
+  color: #fff !important;
+}
+.lk-chat .lk-chat-entry[data-lk-message-origin=remote] .lk-message-body {
+  background-color: #121212 !important;
+}
+@media (max-width: 600px) {
+  .lk-room-container .lk-control-bar .lk-disconnect-button svg,
+  .lk-room-container .lk-control-bar .lk-button svg {
+    position: relative;
+    top: 0;
+  }
 }
