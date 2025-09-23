@@ -219,6 +219,59 @@
   background: #e55a2b;
 }
 
+/* Room URL Section */
+.cpRoomUrlSection {
+  margin-bottom: 20px;
+}
+
+.cpRoomUrlInputContainer {
+  display: flex;
+  align-items: center;
+  background: #0d0d0d;
+  border: 1px solid #121212;
+  border-radius: 0;
+  padding: 12px 16px;
+  gap: 12px;
+}
+
+.cpMeetingIcon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.cpRoomUrlInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 14px;
+  outline: none;
+  font-family: 'Courier New', monospace;
+}
+
+.cpRoomUrlInput::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.cpCopyButton {
+  background: #0d0d0d;
+  border: 0 solid #0d0d0d;
+  border-radius: 0;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.cpCopyIcon {
+  width: 16px;
+  height: 16px;
+}
+
 .cpUsernameSection {
   margin-bottom: 20px;
 }
@@ -236,6 +289,8 @@
 .cpUserIconSmall {
   font-size: 16px;
   color: #999;
+  width: 16px;
+  height: 16px;
 }
 
 .cpUsernameInput {
@@ -339,6 +394,15 @@
 
   .cpDeviceText {
     max-width: 100%;
+  }
+
+  .cpRoomUrlInputContainer {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .cpCopyButton {
+    align-self: flex-end;
   }
 
   .cpRadioGroup {

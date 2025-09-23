@@ -30,6 +30,28 @@ function CustomPreJoinComponent({ defaults, onSubmit, onError }: CustomPreJoinPr
   // Check if debug mode is enabled
   const isDebugMode = searchParams.get('debug') === '1';
 
+  // Get current room URL
+  const roomUrl = typeof window !== 'undefined' ? window.location.href : '';
+
+  // Copy room URL to clipboard
+  const handleCopyUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(roomUrl);
+      // You could add a toast notification here
+      // alert('Room URL copied to clipboard!');
+    } catch (err) {
+      console.error('Failed to copy URL:', err);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = roomUrl;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      alert('Room URL copied to clipboard!');
+    }
+  };
+
   // Load available devices
   useEffect(() => {
     if (typeof navigator !== 'undefined' && navigator.mediaDevices) {
@@ -103,8 +125,8 @@ function CustomPreJoinComponent({ defaults, onSubmit, onError }: CustomPreJoinPr
         username: username.trim(),
         videoEnabled,
         audioEnabled,
-        videoDeviceId: selectedVideoDevice || undefined,
-        audioDeviceId: selectedAudioDevice || undefined,
+        videoDeviceId: selectedVideoDevice || '',
+        audioDeviceId: selectedAudioDevice || '',
       };
 
       onSubmit(values, serverType);
@@ -235,6 +257,28 @@ function CustomPreJoinComponent({ defaults, onSubmit, onError }: CustomPreJoinPr
                     )}
                 </div>
               )}
+            </div>
+          </div>
+
+          {/* Room URL Display */}
+          <div className={styles.cpRoomUrlSection}>
+            <div className={styles.cpRoomUrlInputContainer}>
+              <img src="/icons/meeting.png" alt="Meeting" className={styles.cpMeetingIcon} />
+              <input
+                type="text"
+                value={roomUrl}
+                readOnly
+                className={styles.cpRoomUrlInput}
+                placeholder="Room URL will appear here"
+              />
+              <button
+                type="button"
+                onClick={handleCopyUrl}
+                className={styles.cpCopyButton}
+                title="Copy room URL"
+              >
+                <img src="/icons/copy.png" alt="Copy" className={styles.cpCopyIcon} />
+              </button>
             </div>
           </div>
 
