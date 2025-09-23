@@ -1,12 +1,13 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { decodePassphrase } from '@/lib/client-utils';
 import { DebugMode } from '@/lib/Debug';
 import { KeyboardShortcuts } from '@/lib/KeyboardShortcuts';
 import { RecordingIndicator } from '@/lib/RecordingIndicator';
 import { SettingsMenu } from '@/lib/SettingsMenu';
 import { ConnectionDetails } from '@/lib/types';
+import { encodePassphrase, randomString } from '@/lib/client-utils';
 import {
   formatChatMessageLinks,
   LocalUserChoices,
@@ -55,6 +56,10 @@ export function PageClientImpl(props: {
   const [connectionDetails, setConnectionDetails] = React.useState<ConnectionDetails | undefined>(
     undefined,
   );
+  
+  const router = useRouter();
+  const [e2ee, setE2ee] = useState(false);
+  const [sharedPassphrase, setSharedPassphrase] = useState(randomString(64));
 
   const handlePreJoinSubmit = React.useCallback(
     async (values: LocalUserChoices, serverType: 'livekit' | 'custom') => {
@@ -91,19 +96,31 @@ export function PageClientImpl(props: {
         setConnectionDetails(connectionDetailsData);
       } else {
         // Custom Server mode - sử dụng backend API của team
-        const url = new URL(CONN_DETAILS_ENDPOINT, CONN_BACKEND_ENDPOINT);
-        url.searchParams.append('roomName', props.roomName);
-        url.searchParams.append('participantName', values.username);
-        url.searchParams.append('serverType', 'custom');
-        if (props.region) {
-          url.searchParams.append('region', props.region);
-        }
+        console.log('Custom Server - Calling API: http://livekit-token.ig3.ai/createToken');
 
-        console.log('Custom Server - Calling API:', url.toString());
-        const connectionDetailsResp = await fetch(url.toString());
-        const connectionDetailsData = await connectionDetailsResp.json();
-        console.log('Custom Server - API Response:', connectionDetailsData);
-        setConnectionDetails(connectionDetailsData);
+        // Use Next.js proxy to avoid CORS
+        const response = await fetch('/api/livekit-token/createToken', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            roomName: props.roomName, 
+            participantName: values.username
+          }),
+        });
+        if (!response.ok) throw new Error('Failed to fetch token');
+        const data = await response.json();
+        const serverUrl = data.server_url;
+        const token = data.participant_token;
+        if (!serverUrl || !token) throw new Error('Invalid response from token API');
+        if (e2ee) {
+          router.push(
+            `/custom/?liveKitUrl=${serverUrl}&token=${token}#${encodePassphrase(sharedPassphrase)}`,
+          );
+        } else {
+          router.push(`/custom/?liveKitUrl=${serverUrl}&token=${token}`);
+        }
+        console.log('tested only...');
+        return false;
       }
     },
     [],
