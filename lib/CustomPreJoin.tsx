@@ -20,7 +20,7 @@ function CustomPreJoinComponent({ defaults, onSubmit, onError }: CustomPreJoinPr
   const [videoEnabled, setVideoEnabled] = useState(defaults.videoEnabled ?? true);
   const [audioEnabled, setAudioEnabled] = useState(defaults.audioEnabled ?? true);
   const [isJoining, setIsJoining] = useState(false);
-  const [serverType, setServerType] = useState<'livekit' | 'custom'>('livekit');
+  const [serverType, setServerType] = useState<'livekit' | 'custom'>('custom');
   const [devices, setDevices] = useState<any[]>([]);
   const [selectedAudioDevice, setSelectedAudioDevice] = useState<string>('');
   const [selectedVideoDevice, setSelectedVideoDevice] = useState<string>('');
