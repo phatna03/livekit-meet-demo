@@ -115,6 +115,16 @@ export async function GET(request: NextRequest) {
 
       const backendData = await backendResponse.json();
       console.log('Backend API response:', backendData);
+      
+      // Debug: Check if token contains username
+      try {
+        const tokenPayload = JSON.parse(atob(backendData.participant_token.split('.')[1]));
+        console.log('Backend token payload:', tokenPayload);
+        console.log('Token contains name:', tokenPayload.name);
+        console.log('Token contains identity:', tokenPayload.sub);
+      } catch (e) {
+        console.log('Could not decode backend token:', e);
+      }
 
       // Fix server URL: convert https to wss if needed
       let serverUrl = backendData.server_url || LIVEKIT_URL || 'wss://livekit.ig3.ai:7880';

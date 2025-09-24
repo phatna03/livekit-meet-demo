@@ -61,6 +61,7 @@ export function PageClientImpl(props: {
     liveKitUrl: string;
     token: string;
     codec?: VideoCodec;
+    userChoices: LocalUserChoices;
   } | null>(null);
 
   // Debug log for customServerDetails changes
@@ -125,11 +126,12 @@ export function PageClientImpl(props: {
         if (!serverUrl || !token) throw new Error('Invalid response from token API');
         
         // Set custom server details instead of redirecting
-        console.log('Setting customServerDetails with:', { serverUrl, token, codec: props.codec });
+        console.log('Setting customServerDetails with:', { serverUrl, token, codec: props.codec, userChoices: values });
         setCustomServerDetails({
           liveKitUrl: serverUrl,
           token: token,
-          codec: props.codec
+          codec: props.codec,
+          userChoices: values
         });
         
         console.log('Custom server connected, using VideoConferenceClientImpl');
@@ -149,6 +151,7 @@ export function PageClientImpl(props: {
           liveKitUrl={customServerDetails.liveKitUrl}
           token={customServerDetails.token}
           codec={customServerDetails.codec}
+          userChoices={customServerDetails.userChoices}
         />
       </main>
     );
