@@ -15,6 +15,7 @@ import {
   VideoConference,
 } from '@livekit/components-react';
 import { CustomPreJoin } from '@/lib/CustomPreJoin';
+import { VideoConferenceClientImpl } from '@/lib/VideoConferenceClientImpl';
 import {
   ExternalE2EEKeyProvider,
   RoomOptions,
@@ -56,6 +57,17 @@ export function PageClientImpl(props: {
   const [connectionDetails, setConnectionDetails] = React.useState<ConnectionDetails | undefined>(
     undefined,
   );
+  const [customServerDetails, setCustomServerDetails] = React.useState<{
+    liveKitUrl: string;
+    token: string;
+    codec?: VideoCodec;
+    userChoices: LocalUserChoices;
+  } | null>(null);
+
+  // Debug log for customServerDetails changes
+  React.useEffect(() => {
+    console.log('customServerDetails changed:', customServerDetails);
+  }, [customServerDetails]);
   
   const router = useRouter();
   const [e2ee, setE2ee] = useState(false);
@@ -112,20 +124,38 @@ export function PageClientImpl(props: {
         const serverUrl = data.server_url;
         const token = data.participant_token;
         if (!serverUrl || !token) throw new Error('Invalid response from token API');
-        if (e2ee) {
-          router.push(
-            `/custom/?liveKitUrl=${serverUrl}&token=${token}#${encodePassphrase(sharedPassphrase)}`,
-          );
-        } else {
-          router.push(`/custom/?liveKitUrl=${serverUrl}&token=${token}`);
-        }
-        console.log('tested only...');
-        return false;
+        
+        // Set custom server details instead of redirecting
+        console.log('Setting customServerDetails with:', { serverUrl, token, codec: props.codec, userChoices: values });
+        setCustomServerDetails({
+          liveKitUrl: serverUrl,
+          token: token,
+          codec: props.codec,
+          userChoices: values
+        });
+        
+        console.log('Custom server connected, using VideoConferenceClientImpl');
+        return true;
       }
     },
     [],
   );
   const handlePreJoinError = React.useCallback((e: any) => console.error(e), []);
+
+  // Render custom VideoConference component if using custom server
+  if (customServerDetails) {
+    console.log('Rendering VideoConferenceClientImpl with:', customServerDetails);
+    return (
+      <main data-lk-theme="default" style={{ height: '100%' }}>
+        <VideoConferenceClientImpl
+          liveKitUrl={customServerDetails.liveKitUrl}
+          token={customServerDetails.token}
+          codec={customServerDetails.codec}
+          userChoices={customServerDetails.userChoices}
+        />
+      </main>
+    );
+  }
 
   return (
     <main className={styles.rpMain} data-lk-theme="default">

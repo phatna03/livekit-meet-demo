@@ -122,6 +122,15 @@ h2 a {
 .lk-chat .lk-chat-entry[data-lk-message-origin=remote] .lk-message-body {
   background-color: #121212 !important;
 }
+
+/* Custom disconnect button behavior */
+.lk-room-container .lk-disconnect-button {
+  cursor: pointer !important;
+}
+
+.lk-room-container .lk-disconnect-button:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
 @media (max-width: 600px) {
   .lk-room-container .lk-control-bar .lk-disconnect-button svg,
   .lk-room-container .lk-control-bar .lk-button svg {
